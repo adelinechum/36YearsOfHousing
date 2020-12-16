@@ -7,12 +7,12 @@ var svg = d3.select("body").append("svg")
 */
 
 var colWidth = 25;
-var colHeight = 300;
-var colXMargin = 1;
-var expansionFactor = 3;
-var panelPerCol = 15 //number of panels we want per column
-var panelHeightMargin = 5;
-var panelHeight = (colHeight - panelHeightMargin * panelPerCol) / panelPerCol * 1.5;
+var colHeight = 500;
+var colXMargin = 0.5;
+var expansionFactor = 2;
+var panelPerCol = 44 //number of panels we want per column
+var panelHeightMargin = 1;
+var panelHeight = (colHeight - panelHeightMargin * panelPerCol) / panelPerCol * 2.5;
 var panelWidth = colWidth;
 var centerX = window.innerWidth / 2;
 var centerY = window.innerHeight / 2 - colHeight / 2; //location of grid matrix visualization
@@ -104,7 +104,7 @@ class Column extends Rectangle{
       .setY(centerY)
       .setWidth(colWidth)
       .setHeight(colHeight)
-      .setColor("#333")
+      .setColor("black")
 
     // add text
     this.text = svg.append("text")
@@ -113,15 +113,14 @@ class Column extends Rectangle{
       .attr("y", this.getY())
       .style("font-size", 8)
 
- // TODO: fix mouseon when hover over panels
-
+// expanding when hover column only
     this.form
       .on("mouseenter",
           () => {
             this.transform(expansionFactor);
           }
       )
-      .on("mouseleave",
+      .on("mouseout",
           () => {
             this.transform(1 / expansionFactor)
         }
@@ -188,7 +187,6 @@ class Column extends Rectangle{
       col.updateTextPosition()
     });
 
-
     }
 
     updateTextPosition(){
@@ -196,7 +194,7 @@ class Column extends Rectangle{
         .attr("y", this.getY())
     }
 
-    // add a new planel to the column
+    // add a new panel to the column
     addPanel(img){
       var panel = new Panel(this, img)
       this.panels.push(panel);
@@ -221,6 +219,16 @@ class Panel extends Rectangle{
       .setY(col.getY() + panelHeightMargin * (this.pos + 1) + panelHeight * (this.pos))
       .setWidth(panelWidth)
       .setHeight(panelHeight);
+
+      // expanding panels
+      this.form.on ("mouseenter", () => {
+        this.col.transform(expansionFactor);
+      })
+      .on("mouseleave",() => {
+        this.col.transform( 1 / expansionFactor)
+
+      })
+
   }
 
   updatePosition(){
@@ -244,6 +252,7 @@ d3.dsv(",", "./MasterData.csv", function(d) {
     return e.img != "";
   })
 
+// organize year and images
   var years = uniq(data.map(function (e) {
                 return e.year
               }))
@@ -251,6 +260,7 @@ d3.dsv(",", "./MasterData.csv", function(d) {
                 return {year: f, images: [] }
               });
 
+// group years and images
       years.forEach((g) => {
         data.forEach((h) => {
           if (g.year == h.year) {
@@ -259,6 +269,7 @@ d3.dsv(",", "./MasterData.csv", function(d) {
         });
       });
 
+//create columns for years, panels for image
   years.forEach((e) => {
       var col = Column.addCol(e.year);
       e.images.forEach((img) => {
@@ -279,8 +290,6 @@ d3.dsv(",", "./MasterData.csv", function(d) {
 //   .attr("width", 50)
 //   .attr("height", 50)
 //   .attr("href", "./pages/GSAPP_Exhibition-HousingStudios1974-2014_CompleteBooklet_010.jpg")
-
-
 
 // to return an array of unique values
 function uniq(a) {
