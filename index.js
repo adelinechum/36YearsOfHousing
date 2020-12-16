@@ -106,7 +106,7 @@ class Column extends Rectangle{
       .setHeight(colHeight)
       .setColor("black")
 
-    // add text
+    // add year label
     this.text = svg.append("text")
       .text(year)
       .attr("x", this.getX())
@@ -125,6 +125,8 @@ class Column extends Rectangle{
             this.transform(1 / expansionFactor)
         }
       )
+
+      // TODO: associate tags with panels
   }
 
   updatePanelsPositions(){
@@ -160,8 +162,6 @@ class Column extends Rectangle{
       panel.setY(this.getY() + panelHeightMargin * panelR + (panel.pos + 1) + panelHeight * (panel.pos) * panelR)
       panel.setX(this.getX())
     });
-
-
 
     // TODO: need a better way of differntiating on and off...
     Column.cols.forEach(col => {
@@ -227,6 +227,9 @@ class Panel extends Rectangle{
       .on("mouseleave",() => {
         this.col.transform( 1 / expansionFactor)
 
+      // TODO: add on click function for each panel enlarge
+      // .click("")
+
       })
 
   }
@@ -243,10 +246,12 @@ class Panel extends Rectangle{
 d3.dsv(",", "./MasterData.csv", function(d) {
   return {
     year: d.Year, // convert "Year" column to Date
-    img: d.DocLink
+    img: d.DocLink,
+    tag: d.Tags
   };
 }).then(function(data) {
 
+  // TODO: add shaded boxes for empty lines
   // filter out any empty images
   data = data.filter(function (e) {
     return e.img != "";
@@ -279,8 +284,6 @@ d3.dsv(",", "./MasterData.csv", function(d) {
 
 });
 
-
-//
 // var rect = svg.append("rect")
 // .attr("width", 50)
 // .attr("height", 50)
