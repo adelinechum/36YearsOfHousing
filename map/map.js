@@ -13,19 +13,32 @@ map.on('load', function() {
   map.addSource('projects', {
     'type': 'geojson',
     'data': 'MapData_DataVizFinal.geojson',
-    //'generateId': true // This ensures that all features have unique IDs
+    'generateId': true // This ensures that all features have unique IDs
   });
 
   map.addLayer({
-    'id': 'projects',
+    'id': 'projects-centroids',
     'type': 'circle',
     'source': 'projects',
     'paint': {
       'circle-stroke-color': '#000',
+      'circle-radius':[
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        10,
+        5
+        ],
     'circle-stroke-width': 1,
-    'circle-color': '#000'
+    'circle-color': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      '#ffd300',
+      '#000'
+      ]
     }
   });
+
+  
 
   // Create a popup, but don't add it to the map yet.
 var popup = new mapboxgl.Popup({
@@ -33,7 +46,9 @@ var popup = new mapboxgl.Popup({
   closeOnClick: false
   });
    
-  map.on('mouseenter', 'projects', function (e) {
+  var projectID = null;
+
+  map.on('mouseenter', 'projects-centroids', function (e) {
   // Change the cursor style as a UI indicator.
   map.getCanvas().style.cursor = 'pointer';
    
@@ -55,101 +70,50 @@ var popup = new mapboxgl.Popup({
   popup.setLngLat(coordinates).setHTML('<h4>Coordinator: ' + coordinator + ' Professor: ' + professor + '</h4>'
   + '<h2>' + year +  '</h2>'
   + '<p> Students: ' + student + '</p>').addTo(map);
-  });
+  
+   // Check whether features exist
+   if (e.features.length > 0) {
+
+     // If quakeID for the hovered feature is not null,
+    // use removeFeatureState to reset to the default behavior
+    if (projectID) {
+      map.removeFeatureState({
+        source: "projects",
+        id: projectID
+      });
+    }
+
+    projectID = e.features[0].id;
+
+    // When the mouse moves over the projects layer, update the
+    // feature state for the feature under the mouse
+    map.setFeatureState({
+      source: 'projects',
+      id: projectID,
+    }, {
+      hover: true
+    });
+
+  }
+
+});
    
-  map.on('mouseleave', 'projects', function () {
+  map.on('mouseleave', 'projects-centroids', function () {
   map.getCanvas().style.cursor = '';
   popup.remove();
+  if (projectID) {
+    map.setFeatureState({
+      source: 'projects',
+      id: projectID
+  }, {
+    hover: false
+  });
+  }
+
+  projectID = null;
+  // Remove the information from the previously hovered feature from the sidebar
+  map.getCanvas().style.cursor = '';
   });
 
 
 });  
-//map.addControl(new mapboxgl.FullscreenControl());
-/*
-var container = map.getCanvasContainer();
-var svg = d3
-  .select(container)
-  .append("svg")
-  .attr("width", "100%")
-  .attr("height", "1000")
-  .style("position", "absolute")
-  .style("z-index", 2);
-
-function project(d) {
-    return map.project(new mapboxgl.LngLat(d[0], d[1]));
-  }
-
-  d3.dsv(",", "./TestData.csv", function(d) {
-  return {
-    img: d.DocLink,
-    loc: d.Loc,
-  };
-}).then(function(data) {
-
- // filter out any empty images
- data = data.filter(function (e) {
-  return e.img != "";
-})
-
-var locs = uniq(data.map(function (e) {
-              return e.loc
-            }))
-            .map(function (f) {
-              return {loc: f, images: [] }
-            });
-  
-
-  console.log(locs);
-
-  var frames = svg
-  .selectAll("circle")
-  .data(locs.loc)
-  .enter()
-  .append("circle")
-  .attr("r", 20)
-  .style("fill", "ff0000");
-
-  console.log(frames);
-/*
-  var svgContainer = d3.select("body").append("svg")
-                      .attr("width", 200)
-                      .attr("height", 260);
-
-  var rectangles = svgContainer.selectAll("rectangle")
-                                .data(data.Loc)
-                                .enter()
-                                .append("rectangle");
-
-  function render() {
-    frames
-      .attr("cx", function(d) {
-        return project(d).x;
-      })
-      .attr("cy", function(d) {
-        return project(d).y;
-      });
-  }
-
-
-  map.on("viewreset", render);
-map.on("move", render);
-map.on("moveend", render);
-render(); // Call once to render
-
-});
-
-
-
-
-// to return an array of unique values
-function uniq(a) {
-  var seen = {};
-  return a.filter(function(item) {
-      return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-  });
-}
-
-
-  //var data = [[-73.93, 40.79], [-73.97, 40.75], [-73.95, 40.72]];
-
-*/
