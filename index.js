@@ -7,15 +7,16 @@ var svg = d3.select("body").append("svg")
 */
 
 var colWidth = 25;
-var colHeight = 500;
-var colXMargin = 0.5;
+var colHeight = 0;
+var colXMargin = 5;
 var expansionFactor = 2;
 var panelPerCol = 44 //number of panels we want per column
 var panelHeightMargin = 1;
-var panelHeight = (colHeight - panelHeightMargin * panelPerCol) / panelPerCol * 2.5;
-var panelWidth = colWidth;
+var panelHeight = 35;
+var panelWidth = colWidth - colXMargin;
 var centerX = window.innerWidth / 2;
 var centerY = window.innerHeight / 2 - colHeight / 2; //location of grid matrix visualization
+var eventsEnabled = true
 
 class Rectangle{
 
@@ -104,25 +105,30 @@ class Column extends Rectangle{
       .setY(centerY)
       .setWidth(colWidth)
       .setHeight(colHeight)
-      .setColor("black")
+      .setColor("#333")
 
     // add year label
     this.text = svg.append("text")
       .text(year)
       .attr("x", this.getX())
       .attr("y", this.getY())
-      .style("font-size", 8)
+      .style("font-size", "50%")
+      .style("stroke", "white")
 
 // expanding when hover column only
     this.form
       .on("mouseenter",
           () => {
-            this.transform(expansionFactor);
+            if (1) {
+              this.transform(expansionFactor);
+            }
           }
       )
       .on("mouseout",
           () => {
-            this.transform(1 / expansionFactor)
+            if (1) {
+              this.transform(1 / expansionFactor)
+            }
         }
       )
 
@@ -160,7 +166,7 @@ class Column extends Rectangle{
       panel.setWidth(panelWidth * panelR)
       panel.setHeight(panelHeight * panelR)
       panel.setY(this.getY() + panelHeightMargin * panelR + (panel.pos + 1) + panelHeight * (panel.pos) * panelR)
-      panel.setX(this.getX())
+      panel.setX(this.getX() + colXMargin)
     });
 
     // TODO: need a better way of differntiating on and off...
@@ -190,7 +196,7 @@ class Column extends Rectangle{
     }
 
     updateTextPosition(){
-      this.text.attr("x", this.getX())
+      return this.text.attr("x", this.getX())
         .attr("y", this.getY())
     }
 
@@ -199,8 +205,8 @@ class Column extends Rectangle{
       var panel = new Panel(this, img)
       this.panels.push(panel);
       this.panelNum ++;
+      this.setHeight(this.getHeight() + panelHeight + panelHeightMargin)
     }
-
 }
 
 class Panel extends Rectangle{
@@ -212,34 +218,82 @@ class Panel extends Rectangle{
     this.form = svg.append("image")
       .attr("href", img);
 
+      //
+    this.img = img
+
     // position of panel in col. 0 being highest
     this.pos = col.panelNum
 
-    this.setX(col.getX())
+    this.setX(col.getX() + colXMargin / 2)
       .setY(col.getY() + panelHeightMargin * (this.pos + 1) + panelHeight * (this.pos))
       .setWidth(panelWidth)
       .setHeight(panelHeight);
 
       // expanding panels
       this.form.on ("mouseenter", () => {
-        this.col.transform(expansionFactor);
+        if (1) {
+          this.col.transform(expansionFactor);
+        }
       })
       .on("mouseleave",() => {
-        this.col.transform( 1 / expansionFactor)
-
-      // TODO: add on click function for each panel enlarge
-      // .click("")
-
+        if (1) {
+          this.col.transform( 1 / expansionFactor)
+        }
       })
 
+      .on ("click", () => {
+        if (1) {
+          this.enlarge()
+        }
+      }
+    )
+
+  }
+
+  //click for fullscreen panel
+
+  enlarge(){
+
+    eventsEnabled = false;
+
+    var enlargedImage = svg.append("image")
+    .attr("href", this.img)
+    .attr("width", this.getWidth())
+    .attr("height", this.getHeight())
+    .attr ("x", this.getX())
+    .attr ("y", this.getY())
+
+    var t = d3.transition()
+    .duration(250)
+    .ease(d3.easeLinear);
+
+    window.setTimeout(() => {
+      eventsEnabled = true;
+    }, 250)
+
+    enlargedImage.transition(t)
+    .attr("width", window.innerWidth * 0.75)
+    .attr("height", window.innerHeight * 0.75)
+    .attr("x", (window.innerWidth * 0.25) / 2)
+    .attr("y", (window.innerHeight * 0.25) / 2)
+
+    enlargedImage.on("mouseleave", () => {
+      if (eventsEnabled) {
+        enlargedImage.remove()
+      }
+    })
+
+    // this.setHeight(window.innerHeight * 0.75)
+    // .setWidth (window.innerWidth * 0.75)
+    // .setX ((window.innerWidth - this.getWidth()) /2)
+    // .setY ((window.innerHeight - this.getHeight()) /2)
   }
 
   updatePosition(){
-    this.setX(this.col.getX())
+    this.setX(this.col.getX() + colXMargin / 2)
       .setY(this.col.getY() + panelHeightMargin * (this.pos + 1) + panelHeight * (this.pos))
   }
 
-  //j
 
 }
 
@@ -247,7 +301,7 @@ d3.dsv(",", "./MasterData.csv", function(d) {
   return {
     year: d.Year, // convert "Year" column to Date
     img: d.DocLink,
-    tag: d.Tags
+    // tag: d.Tags
   };
 }).then(function(data) {
 
@@ -283,16 +337,6 @@ d3.dsv(",", "./MasterData.csv", function(d) {
   });
 
 });
-
-// var rect = svg.append("rect")
-// .attr("width", 50)
-// .attr("height", 50)
-// .style("fill", "blue")
-//
-// var image = svg.append("image")
-//   .attr("width", 50)
-//   .attr("height", 50)
-//   .attr("href", "./pages/GSAPP_Exhibition-HousingStudios1974-2014_CompleteBooklet_010.jpg")
 
 // to return an array of unique values
 function uniq(a) {
