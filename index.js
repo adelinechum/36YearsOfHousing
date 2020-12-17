@@ -6,16 +6,16 @@ var svg = d3.select("body").append("svg")
 * Global Size Variables
 */
 
-var colWidth = 25;
+var colWidth = 30;
 var colHeight = 0;
 var colXMargin = 5;
 var expansionFactor = 2;
-var panelPerCol = 44 //number of panels we want per column
-var panelHeightMargin = 1;
+var panelPerCol = 7 //number of panels we want per column
+var panelHeightMargin = 10;
 var panelHeight = 35;
 var panelWidth = colWidth - colXMargin;
 var centerX = window.innerWidth / 2;
-var centerY = window.innerHeight / 2 - colHeight / 2; //location of grid matrix visualization
+var centerY = window.innerHeight / 2 - (panelPerCol * (panelHeightMargin + panelHeight)); //location of grid matrix visualization
 var eventsEnabled = true
 
 class Rectangle{
@@ -165,7 +165,7 @@ class Column extends Rectangle{
     this.panels.forEach(panel => {
       panel.setWidth(panelWidth * panelR)
       panel.setHeight(panelHeight * panelR)
-      panel.setY(this.getY() + panelHeightMargin * panelR + (panel.pos + 1) + panelHeight * (panel.pos) * panelR)
+      panel.setY(this.getY() + panelHeightMargin * panelR * (panel.pos + 1) + panelHeight * (panel.pos) * panelR)
       panel.setX(this.getX() + colXMargin)
     });
 
@@ -233,6 +233,7 @@ class Panel extends Rectangle{
       this.form.on ("mouseenter", () => {
         if (1) {
           this.col.transform(expansionFactor);
+          this.transform(1.3);
         }
       })
       .on("mouseleave",() => {
@@ -241,13 +242,27 @@ class Panel extends Rectangle{
         }
       })
 
-      .on ("click", () => {
+      .on("click", () => {
         if (1) {
           this.enlarge()
         }
       }
     )
 
+  }
+
+  transform(r){
+
+    var oldWidth = this.getWidth()
+    var newWidth = this.getWidth() * r
+    var oldHeight = this.getHeight()
+    var newHeight = this.getHeight() * r
+
+
+    this.setWidth(newWidth)
+    this.setHeight(newHeight)
+    this.setX(this.getX() + (oldWidth - newWidth) / 2)
+    this.setY(this.getY() + (oldHeight - newHeight) / 2)
   }
 
   //click for fullscreen panel
@@ -283,10 +298,14 @@ class Panel extends Rectangle{
       }
     })
 
-    // this.setHeight(window.innerHeight * 0.75)
-    // .setWidth (window.innerWidth * 0.75)
-    // .setX ((window.innerWidth - this.getWidth()) /2)
-    // .setY ((window.innerHeight - this.getHeight()) /2)
+    d3.select("body").on("keydown", () => {
+      if (d3.event.keyCode == 27) {
+        enlargedImage.remove()
+        // remove event listener
+        d3.select('body').on("keydown", null)
+      }
+    })
+
   }
 
   updatePosition(){
