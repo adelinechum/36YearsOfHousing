@@ -2,7 +2,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYWRhbXZvc2J1cmdoIiwiYSI6ImNrOGE5MDhudzAzcHozb
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/adamvosburgh/ckeddanot0pr31aoc1sjs9juv',
-    zoom: 12,
+    zoom: 9.5,
     maxZoom:14,
     minZoom:9,
     center: [-73.9612, 40.8083]
@@ -14,6 +14,38 @@ map.on('load', function() {
     'type': 'geojson',
     'data': 'MapData_DataVizFinal.geojson',
     'generateId': true // This ensures that all features have unique IDs
+  });
+  map.addSource('columbia', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+            // feature for Mapbox DC
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [
+                -73.961107,
+                40.808329
+                ]
+                },
+                'properties': {
+                'title': 'Columbia GSAPP'
+                }
+                },
+        ]
+        }
+    });
+
+  map.addLayer({
+    'id': 'columbia-border',
+    'type': 'circle',
+    'source': 'columbia',
+      'paint': {
+      'circle-radius': 5,
+      'circle-color': '#296d98',
+      }
   });
 
   map.addLayer({
@@ -57,6 +89,7 @@ var popup = new mapboxgl.Popup({
   var coordinator = e.features[0].properties.Coordinator;
   var professor = e.features[0].properties.prof;
   var student = e.features[0].properties.StudentName;
+  //var img = e.features[0].properites.DocLink;
    
   // Ensure that if the map is zoomed out such that multiple
   // copies of the feature are visible, the popup appears
