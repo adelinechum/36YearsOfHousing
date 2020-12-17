@@ -2,9 +2,68 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYWRhbXZvc2J1cmdoIiwiYSI6ImNrOGE5MDhudzAzcHozb
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/adamvosburgh/ckeddanot0pr31aoc1sjs9juv',
-    zoom: 13,
+    zoom: 12,
+    maxZoom:14,
+    minZoom:9,
     center: [-73.9612, 40.8083]
 });
+
+map.on('load', function() {
+
+  map.addSource('projects', {
+    'type': 'geojson',
+    'data': 'MapData_DataVizFinal.geojson',
+    //'generateId': true // This ensures that all features have unique IDs
+  });
+
+  map.addLayer({
+    'id': 'projects',
+    'type': 'circle',
+    'source': 'projects',
+    'paint': {
+      'circle-stroke-color': '#000',
+    'circle-stroke-width': 1,
+    'circle-color': '#000'
+    }
+  });
+
+  // Create a popup, but don't add it to the map yet.
+var popup = new mapboxgl.Popup({
+  closeButton: false,
+  closeOnClick: false
+  });
+   
+  map.on('mouseenter', 'projects', function (e) {
+  // Change the cursor style as a UI indicator.
+  map.getCanvas().style.cursor = 'pointer';
+   
+  var coordinates = e.features[0].geometry.coordinates.slice();
+  var year = e.features[0].properties.Year;
+  var coordinator = e.features[0].properties.Coordinator;
+  var professor = e.features[0].properties.prof;
+  var student = e.features[0].properties.StudentName;
+   
+  // Ensure that if the map is zoomed out such that multiple
+  // copies of the feature are visible, the popup appears
+  // over the copy being pointed to.
+  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+  coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+  }
+   
+  // Populate the popup and set its coordinates
+  // based on the feature found.
+  popup.setLngLat(coordinates).setHTML('<h4>Coordinator: ' + coordinator + ' Professor: ' + professor + '</h4>'
+  + '<h2>' + year +  '</h2>'
+  + '<p> Students: ' + student + '</p>').addTo(map);
+  });
+   
+  map.on('mouseleave', 'projects', function () {
+  map.getCanvas().style.cursor = '';
+  popup.remove();
+  });
+
+
+});  
 //map.addControl(new mapboxgl.FullscreenControl());
 /*
 var container = map.getCanvasContainer();
