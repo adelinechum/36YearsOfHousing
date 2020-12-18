@@ -87,7 +87,7 @@ var popup = new mapboxgl.Popup({
   var coordinates = e.features[0].geometry.coordinates.slice();
   var year = e.features[0].properties.Year;
   var coordinator = e.features[0].properties.Coordinator;
-  var professor = e.features[0].properties.prof;
+  var professor = e.features[0].properties.Prof;
   var student = e.features[0].properties.StudentName;
   //var img = e.features[0].properites.DocLink;
    
@@ -100,8 +100,8 @@ var popup = new mapboxgl.Popup({
    
   // Populate the popup and set its coordinates
   // based on the feature found.
-  popup.setLngLat(coordinates).setHTML('<h4>Coordinator: ' + coordinator + ' Professor: ' + professor + '</h4>'
-  + '<h2>' + year +  '</h2>'
+  popup.setLngLat(coordinates).setHTML('<h2>' + year +  '</h2>' + 
+  '<h4>Coordinator: ' + coordinator + '<br>' + ' Professor: ' + professor + '</h4>'
   + '<p> Students: ' + student + '</p>').addTo(map);
   
    // Check whether features exist

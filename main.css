@@ -76,9 +76,6 @@ body {
 .mapboxgl-popup-content h4 {
   font-weight: 300;
   font-size: 0.9em;
-  border-width: 0px 0px 0.5px 0px;
-  border-style: solid;
-  border-color: rgb(80, 80, 80);
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   color: black;
@@ -89,6 +86,9 @@ body {
   margin-top: 0.5em;
   margin-bottom: 0.3em;
   color: black;
+  border-width: 0px 0px 0.5px 0px;
+  border-style: solid;
+  border-color: rgb(80, 80, 80);
 }
 
 .mapboxgl-popup-content p {
@@ -96,4 +96,8 @@ body {
   margin-top: 0.3em;
   margin-bottom: 0em;
   color: black;
+}
+
+.about {
+ padding-top: 100px;
 }
