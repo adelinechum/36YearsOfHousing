@@ -14,7 +14,7 @@ var expansionFactor = 2.5;
 var backgroundGrey = "#333"
 
 // panels
-var panelPerCol = 15 //number of panels we want per column and sets startight height of viz
+var panelPerCol = 13 //number of panels we want per column and sets startight height of viz
 var panelHeightMargin = 5;
 var panelHeight = 35;
 var panelWidth = colWidth - colXMargin;
@@ -26,14 +26,14 @@ var eventsEnabled = true
 
 // legends
 var legendX = window.innerWidth * 0.1
-var legendY = window.innerHeight * 0.60
+var legendY = window.innerHeight * 0.80
 var legendMargin = 25
 var subcateogryMargin = 25
 var categoryXMargin = 25;
 
 // header
 var headerX = window.innerWidth * 0.1
-var headerY = window.innerHeight * 0.05
+var headerY = window.innerHeight * 0.10
 
 var header = createHeader()
 
@@ -141,7 +141,7 @@ class Column extends Rectangle{
       .attr("x", this.getX())
       .attr("y", this.getY())
       .style("font-size", "50%")
-      .style("stroke", "white")
+      .style("fill", "white")
 
 // expanding when hover column only
     this.form
@@ -396,7 +396,7 @@ function createHeader(){
   header.attr("x", headerX)
     .attr("y", headerY)
     .style("font-size", "30")
-    .style("stroke", "white")
+    .style("fill", "white")
   return header
 }
 
@@ -414,7 +414,7 @@ class CategoryAbstract{
      this.name = name
      this.text = svg.append("text")
       .text(name)
-      .style("stroke", "white")
+      .style("fill", "white")
       // .on('click', () => {
       //   Category.highlight(name)
       //   this.setColor(Category.colorScale(name))
@@ -437,7 +437,7 @@ class CategoryAbstract{
    }
 
    setColor(color){
-     this.text.style("stroke", color)
+     this.text.style("fill", color)
      return this
    }
 
