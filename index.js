@@ -1,6 +1,7 @@
 var svg = d3.select("body").append("svg")
   .attr("width", window.innerWidth)
   .attr("height", window.innerHeight)
+  .style("cursor", "pointer")
 
 /*
 * Global Size Variables
