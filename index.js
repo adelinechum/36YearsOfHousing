@@ -143,7 +143,7 @@ class Column extends Rectangle{
       .text(year)
       .attr("x", this.getX())
       .attr("y", this.getY())
-      .style("font-size", "50%")
+      .style("font-size", "70%")
       .style("fill", "white")
 
 // expanding when hover column only
