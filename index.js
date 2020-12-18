@@ -19,9 +19,10 @@ var panelHeightMargin = 5;
 var panelHeight = 35;
 var panelWidth = colWidth - colXMargin;
 
-// window
+// window //location of grid matrix
 var centerX = window.innerWidth / 2;
-var centerY = window.innerHeight / 2 - (panelPerCol * (panelHeightMargin + panelHeight)); //location of grid matrix visualization
+// var centerY = window.innerHeight / 2 - (panelPerCol * (panelHeightMargin + panelHeight)); // to use for later when entire visualization is more reactive
+var centerY = window.innerHeight * 0.12
 var eventsEnabled = true
 
 // legends
@@ -232,7 +233,7 @@ legend
       var panel = new Panel(this, img)
       this.panels.push(panel);
       this.panelNum ++;
-      this.setHeight(this.getHeight() + panelHeight + panelHeightMargin)
+      this.setHeight(this.getHeight() + panelHeight + panelHeightMargin + 1)
     }
 }
 
@@ -482,7 +483,7 @@ class Category extends CategoryAbstract {
     super(cat.name)
     this.subCategories = cat.subCategories
     this.count = Category.count
-    this.setFontSize("20px")
+    this.setFontSize("14px")
       .setX(xStart)
       .setY(legendY)
 
