@@ -117,7 +117,7 @@ class Column extends Rectangle{
       .setY(centerY)
       .setWidth(colWidth)
       .setHeight(colHeight)
-      .setColor("#333")
+      .setColor("#222")
 
     // add year label
     this.text = svg.append("text")

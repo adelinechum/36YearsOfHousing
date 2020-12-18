@@ -6,15 +6,15 @@
 
 body {
   font-family:"Open Sans", sans-serif;
-  background-color: #333;
-  color: white;
-  margin-top: 50px;
+  background-color: #222;
+  color: rgba(255, 255, 255, 0.856);
+  margin-top: 0;
 
 }
  /* NAVIGATION BAR */
 /* Add a black background color to the top navigation */
 .topnav {
-  background-color: #333;
+  background-color: #222;
   overflow: hidden;
   position: fixed;
   display: inline-block;
@@ -48,7 +48,9 @@ body {
 .caption{
   font-style: italic;
   font-size: 10;
-  text-align: center;
+  text-align: left;
+  margin-top: 10px;
+  margin-left: 20px;
 }
 
 .title{
@@ -57,11 +59,8 @@ body {
   font-style: oblique;
   font-weight: 600;
   font-size: 25px;
-  display: block;
-}
-
-svg{
-  cursor: pointer;
+  display: inline-block;
+  padding: 10px;
 }
 
 #map {
@@ -71,3 +70,46 @@ svg{
     position: absolute;
      z-index: -1;
 }
+
+
+
+.mapboxgl-popup {
+  max-width: 400px;
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.mapboxgl-popup-content h4 {
+  font-weight: 300;
+  font-size: 0.9em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  color: black;
+}
+
+.mapboxgl-popup-content h2 {
+  font-weight: 500;
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+  color: black;
+  border-width: 0px 0px 0.5px 0px;
+  border-style: solid;
+  border-color: rgb(80, 80, 80);
+}
+
+.mapboxgl-popup-content p {
+  font-weight: 300;
+  margin-top: 0.3em;
+  margin-bottom: 0em;
+  color: black;
+}
+
+.about {
+ padding-top: 100px;
+ font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+ padding-left: 20px;
+ padding-right: 20px;
+}
+
+.about b {
+  color: white
+ }

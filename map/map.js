@@ -2,95 +2,154 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYWRhbXZvc2J1cmdoIiwiYSI6ImNrOGE5MDhudzAzcHozb
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/adamvosburgh/ckeddanot0pr31aoc1sjs9juv',
-    zoom: 13,
+    zoom: 9.5,
+    maxZoom:14,
+    minZoom:9,
     center: [-73.9612, 40.8083]
 });
-//map.addControl(new mapboxgl.FullscreenControl());
-/*
-var container = map.getCanvasContainer();
-var svg = d3
-  .select(container)
-  .append("svg")
-  .attr("width", "100%")
-  .attr("height", "1000")
-  .style("position", "absolute")
-  .style("z-index", 2);
 
-function project(d) {
-    return map.project(new mapboxgl.LngLat(d[0], d[1]));
-  }
+map.on('load', function() {
 
-  d3.dsv(",", "./TestData.csv", function(d) {
-  return {
-    img: d.DocLink,
-    loc: d.Loc,
-  };
-}).then(function(data) {
+  map.addSource('projects', {
+    'type': 'geojson',
+    'data': 'MapData_DataVizFinal.geojson',
+    'generateId': true // This ensures that all features have unique IDs
+  });
+  map.addSource('columbia', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+            // feature for Mapbox DC
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [
+                -73.961107,
+                40.808329
+                ]
+                },
+                'properties': {
+                'title': 'Columbia GSAPP'
+                }
+                },
+        ]
+        }
+    });
 
- // filter out any empty images
- data = data.filter(function (e) {
-  return e.img != "";
-})
+  map.addLayer({
+    'id': 'columbia-border',
+    'type': 'circle',
+    'source': 'columbia',
+      'paint': {
+      'circle-radius': 5,
+      'circle-color': '#296d98',
+      }
+  });
 
-var locs = uniq(data.map(function (e) {
-              return e.loc
-            }))
-            .map(function (f) {
-              return {loc: f, images: [] }
-            });
+  map.addLayer({
+    'id': 'projects-centroids',
+    'type': 'circle',
+    'source': 'projects',
+    'paint': {
+      'circle-stroke-color': '#000',
+      'circle-radius':[
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        10,
+        5
+        ],
+    'circle-stroke-width': 1,
+    'circle-color': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      '#ffd300',
+      '#000'
+      ]
+    }
+  });
+
   
 
-  console.log(locs);
+  // Create a popup, but don't add it to the map yet.
+var popup = new mapboxgl.Popup({
+  closeButton: false,
+  closeOnClick: false
+  });
+   
+  var projectID = null;
 
-  var frames = svg
-  .selectAll("circle")
-  .data(locs.loc)
-  .enter()
-  .append("circle")
-  .attr("r", 20)
-  .style("fill", "ff0000");
+  map.on('mouseenter', 'projects-centroids', function (e) {
+  // Change the cursor style as a UI indicator.
+  map.getCanvas().style.cursor = 'pointer';
+   
+  var coordinates = e.features[0].geometry.coordinates.slice();
+  var year = e.features[0].properties.Year;
+  var coordinator = e.features[0].properties.Coordinator;
+  var professor = e.features[0].properties.Prof;
+  var student = e.features[0].properties.StudentName;
+  //var img = e.features[0].properites.DocLink;
+  var student = student.toUpperCase();
+  var coordinator = coordinator.toUpperCase();
+  var professor = professor.toUpperCase();
+   
+  // Ensure that if the map is zoomed out such that multiple
+  // copies of the feature are visible, the popup appears
+  // over the copy being pointed to.
+  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+  coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+  }
+   
+  // Populate the popup and set its coordinates
+  // based on the feature found.
+  popup.setLngLat(coordinates).setHTML('<h2>' + year +  '</h2>' + 
+  '<h4>Coordinator: ' + coordinator + '<br>' + ' Professor: ' + professor + '</h4>'
+  + '<p> Students: ' + student + '</p>').addTo(map);
+  
+   // Check whether features exist
+   if (e.features.length > 0) {
 
-  console.log(frames);
-/*
-  var svgContainer = d3.select("body").append("svg")
-                      .attr("width", 200)
-                      .attr("height", 260);
-
-  var rectangles = svgContainer.selectAll("rectangle")
-                                .data(data.Loc)
-                                .enter()
-                                .append("rectangle");
-
-  function render() {
-    frames
-      .attr("cx", function(d) {
-        return project(d).x;
-      })
-      .attr("cy", function(d) {
-        return project(d).y;
+     // If quakeID for the hovered feature is not null,
+    // use removeFeatureState to reset to the default behavior
+    if (projectID) {
+      map.removeFeatureState({
+        source: "projects",
+        id: projectID
       });
+    }
+
+    projectID = e.features[0].id;
+
+    // When the mouse moves over the projects layer, update the
+    // feature state for the feature under the mouse
+    map.setFeatureState({
+      source: 'projects',
+      id: projectID,
+    }, {
+      hover: true
+    });
+
   }
 
-
-  map.on("viewreset", render);
-map.on("move", render);
-map.on("moveend", render);
-render(); // Call once to render
-
 });
-
-
-
-
-// to return an array of unique values
-function uniq(a) {
-  var seen = {};
-  return a.filter(function(item) {
-      return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+   
+  map.on('mouseleave', 'projects-centroids', function () {
+  map.getCanvas().style.cursor = '';
+  popup.remove();
+  if (projectID) {
+    map.setFeatureState({
+      source: 'projects',
+      id: projectID
+  }, {
+    hover: false
   });
-}
+  }
+
+  projectID = null;
+  // Remove the information from the previously hovered feature from the sidebar
+  map.getCanvas().style.cursor = '';
+  });
 
 
-  //var data = [[-73.93, 40.79], [-73.97, 40.75], [-73.95, 40.72]];
-
-*/
+});  
