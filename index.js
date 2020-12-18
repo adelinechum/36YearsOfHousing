@@ -7,15 +7,15 @@ var svg = d3.select("body").append("svg")
 */
 
 // columns
-var colWidth = 25;
+var colWidth = 30;
 var colHeight = 0;
-var colXMargin = 5;
-var expansionFactor = 2;
+var colXMargin = 1;
+var expansionFactor = 2.5;
 var backgroundGrey = "#333"
 
 // panels
-var panelPerCol = 7 //number of panels we want per column
-var panelHeightMargin = 10;
+var panelPerCol = 15 //number of panels we want per column and sets startight height of viz
+var panelHeightMargin = 5;
 var panelHeight = 35;
 var panelWidth = colWidth - colXMargin;
 
@@ -31,11 +31,10 @@ var legendMargin = 25
 var subcateogryMargin = 25
 var categoryXMargin = 25;
 
-
-
-var headerX = window.innerWidth * 0.1
-var headerY = window.innerHeight * 0.1
 // header
+var headerX = window.innerWidth * 0.1
+var headerY = window.innerHeight * 0.05
+
 var header = createHeader()
 
 
@@ -86,9 +85,6 @@ class Rectangle{
 
   }
 
-// TODO: make column height adjust to panels
-// TODO: center adjust columns instead of top aligned
-
 class Column extends Rectangle{
 
   // collection of all column
@@ -106,7 +102,6 @@ class Column extends Rectangle{
         col.updatePanelsPositions();
       });
     }
-
 
     var res = new Column(centerX + (colWidth + colXMargin) * Column.all.length / 2, year, tags);
     Column.all.push(res);
@@ -165,7 +160,6 @@ class Column extends Rectangle{
         }
       )
 
-      // TODO: associate tags with panels
   }
 legend
   updatePanelsPositions(){
@@ -331,6 +325,7 @@ class Panel extends Rectangle{
       }
     })
 
+// esc key to remove
     d3.select("body").on("keydown", () => {
       if (d3.event.keyCode == 27) {
         enlargedImage.remove()
@@ -413,9 +408,6 @@ function setHeaderText(text){
   header.text('STUDIO BRIEFS THAT INCLUDE OR EMPHASIZE: ' + text)
 }
 
-// STUDIO BRIEFS THAT INCLUDE OR EMPHASIZE: +"category" OR "sub-category"
-
-
 class CategoryAbstract{
 
    constructor(name){
@@ -490,7 +482,7 @@ class Category extends CategoryAbstract {
     super(cat.name)
     this.subCategories = cat.subCategories
     this.count = Category.count
-    this.setFontSize("14px")
+    this.setFontSize("20px")
       .setX(xStart)
       .setY(legendY)
 
@@ -504,6 +496,7 @@ class Category extends CategoryAbstract {
       this.subCategories[i] = new Subcategory(name, this, i)
     });
 
+// grey out existing colored text and color new
     this.text.on('click', () => {
       Category.greyAll()
       Column.greyAll()
@@ -522,7 +515,6 @@ class Category extends CategoryAbstract {
 // useful for setting Categories close to each OTHER
 // on x-axis
 
-
   getMaxLength(){
     var maxLength = this.getLength()
     this.subCategories.forEach(subCat => {
@@ -537,6 +529,7 @@ class Category extends CategoryAbstract {
     return this.getMaxLength() + this.getX() + categoryXMargin
   }
 
+// set categories and colors for tags here
   static categoryTags = ['TERMS OF SCALE','LOW RISE HIGH DENSITY','MID DENSITY','HIGH DENSITY',
   'SITE', 'SHARED SITE','DIFFERENT SITES',
   'UNIQUE STUDIOS', 'OLYMPICS BID','STUDENT HOUSING', 'COLUMBIA PROJECT HOUSING',
@@ -577,7 +570,6 @@ class Subcategory extends CategoryAbstract{
         .setX(this.cat.getX())
         .setY(legendY + subcateogryMargin * (i + 1))
 
-
   this.text.on('click', () => {
     Category.greyAll()
     Column.greyAll()
@@ -590,6 +582,7 @@ class Subcategory extends CategoryAbstract{
   }
 }
 
+//list of categories and subs
 function createLegend() {
   var categories = [{name: 'TERMS OF SCALE', subCategories: ['LOW RISE HIGH DENSITY',
   'MID DENSITY', 'HIGH DENSITY']},
@@ -615,7 +608,6 @@ function createLegend() {
 
   Category.createCategories(categories)
 }
-
 
 // to return an array of unique values
 function uniq(a) {
