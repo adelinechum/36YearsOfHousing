@@ -6,17 +6,29 @@ var svg = d3.select("body").append("svg")
 * Global Size Variables
 */
 
-var colWidth = 30;
+// columns
+var colWidth = 25;
 var colHeight = 0;
 var colXMargin = 5;
 var expansionFactor = 2;
+
+// panels
 var panelPerCol = 7 //number of panels we want per column
 var panelHeightMargin = 10;
 var panelHeight = 35;
 var panelWidth = colWidth - colXMargin;
+
+// window
 var centerX = window.innerWidth / 2;
 var centerY = window.innerHeight / 2 - (panelPerCol * (panelHeightMargin + panelHeight)); //location of grid matrix visualization
 var eventsEnabled = true
+
+// legends
+var legendX = window.innerWidth * 0.1
+var legendY = window.innerHeight * 0.60
+var legendMargin = 25
+var subcateogryMargin = 25
+var categoryXMargin = 25;
 
 class Rectangle{
 
@@ -313,14 +325,13 @@ class Panel extends Rectangle{
       .setY(this.col.getY() + panelHeightMargin * (this.pos + 1) + panelHeight * (this.pos))
   }
 
-
 }
 
 d3.dsv(",", "./MasterData.csv", function(d) {
   return {
     year: d.Year, // convert "Year" column to Date
     img: d.DocLink,
-    // tag: d.Tags
+    tag: d.Tags
   };
 }).then(function(data) {
 
@@ -335,14 +346,18 @@ d3.dsv(",", "./MasterData.csv", function(d) {
                 return e.year
               }))
               .map(function (f) {
-                return {year: f, images: [] }
-              });
+                return {year: f, images: [], tags: null}
+              })
+
+  console.log(years);
+
 
 // group years and images
       years.forEach((g) => {
         data.forEach((h) => {
           if (g.year == h.year) {
             g.images.push(h.img)
+            g.tags = h.tag
           }
         });
       });
@@ -356,6 +371,169 @@ d3.dsv(",", "./MasterData.csv", function(d) {
   });
 
 });
+
+
+
+
+class CategoryAbstract{
+
+   constructor(name){
+     this.name = name
+     this.text = svg.append("text")
+      .text(name)
+      .style("stroke", "white")
+   }
+
+   setFontSize(fontSize){
+     this.text.style("font-size", fontSize)
+     return this
+   }
+
+   setX(x){
+     this.text.attr("x", x)
+     return this
+   }
+
+   setY(y){
+     this.text.attr("y", y)
+     return this
+   }
+
+   setColor(color){
+     this.text.color = color
+   }
+
+   getLength(){
+     return +this.text.node().getBBox().width
+   }
+
+   getX(){
+     return +this.text.attr("x")
+   }
+
+
+}
+
+class Category extends CategoryAbstract {
+
+  static count = 0
+
+  static categories = []
+
+
+
+  static createCategories(categories){
+    var xStart = legendX
+    categories.forEach(cat => {
+      var category = new Category(cat, xStart)
+      categories.push(category)
+      xStart = category.getStartX()
+    });
+  }
+
+  constructor(cat, xStart) {
+    super(cat.name)
+    this.subCategories = cat.subCategories
+    this.count = Category.count
+    this.setFontSize("14px")
+      .setX(xStart)
+      .setY(legendY)
+
+    Category.count ++;
+
+    // console.log(this.text.node().getBBox().width);
+
+    this.maxWidth = this.getLength()
+
+    this.subCategories.forEach((name, i) => {
+      this.subCategories[i] = new Subcategory(name, this, i)
+    });
+
+  }
+
+// gets max length of all category and subcategory text.
+// useful for setting Categories close to each OTHER
+// on x-axis
+
+
+  getMaxLength(){
+    var maxLength = this.getLength()
+    this.subCategories.forEach(subCat => {
+      if (maxLength < subCat.getLength()) {
+        maxLength = subCat.getLength()
+      }
+    });
+    return maxLength
+  }
+
+  getStartX(){
+    return this.getMaxLength() + this.getX() + categoryXMargin
+  }
+
+  static categoryTags = ['TERMS OF SCALE','LOW RISE HIGH DENSITY','MID DENSITY','HIGH DENSITY','SITE', 'SHARED SITE','DIFFERENT SITES', 'UNIQUE STUDIOS', 'OLYMPICS BID','STUDENT HOUSING', 'COLUMBIA PROJECT HOUSING', 'TAKE ON "HOUSING PROBLEM"', 'GRAPPLING WITH GENERIC','PROPOSING NEW MODES', 'PEDAGOGY', 'TYPOLOGY','PRECEDENT STUDY', 'SITE ANALYSIS', 'BRIEF LENGTH', 'SHORT','MEDIUM', 'LONG', 'OTHER', 'FINANCE/POLICY','NEIGHBORHOOD','GOV. AGENCY PARTNERSHIP', 'MIXED-USE']
+
+  static categoryColors = ["#C94D00", "#E6730D", "#FF9326", "#FFAF5D", "#94C71E",  "#B1E642", "#DCFF7F", "#E0CE00", "#FFF500", "#FFFF70", "#FFFEC8", "#8B11CC", "#C76BFF", "#D9B1FF", "#3DB88D", "#21D68C", "#7CFFAF", "#B9FFCD", "#9E2800", "#CC2E00", "#FF794E", "#FFAB87", "#073682", "#0756A6", "#2C8FE6", "#71B0EB", "#B2D7FF"]
+
+  static highlight(tag){
+    Category.categories.forEach(cat => {
+      if (true) {
+
+      }
+    });
+  }
+
+}
+
+class Subcategory extends CategoryAbstract{
+  constructor(name, cat, i) {
+    super(name)
+    this.cat = cat
+
+    this.setFontSize("10px")
+        .setX(this.cat.getX())
+        .setY(legendY + subcateogryMargin * (i + 1))
+
+    // this.text.on({
+    //   "mouseover": function(d) {
+    //     d3.select(this).style("cursor", "pointer");
+    //   },
+    //   "mouseout": function(d) {
+    //     d3.select(this).style("cursor", "default");
+    //   }
+    // });
+
+  }
+}
+
+function createLegend() {
+  var categories = [{name: 'TERMS OF SCALE', subCategories: ['LOW RISE HIGH DENSITY',
+  'MID DENSITY', 'HIGH DENSITY']},
+
+  {name: 'SITE', subCategories: ['SHARED SITE',
+  'DIFFERENT SITES']},
+
+  {name: 'UNIQUE STUDIOS', subCategories: ['OLYMPICS BID',
+  'STUDENT HOUSING', 'COLUMBIA PROJECT HOUSING']},
+
+  {name: 'TAKE ON "HOUSING PROBLEM"', subCategories: ['GRAPPLING WITH GENERIC',
+  'PROPOSING NEW MODES']},
+
+  {name: 'PEDAGOGY', subCategories: ['TYPOLOGY',
+  'PRECEDENT STUDY', 'SITE ANALYSIS']},
+
+  {name: 'BRIEF LENGTH', subCategories: ['SHORT',
+  'MEDIUM', 'LONG']},
+
+  {name: 'OTHER', subCategories: ['FINANCE/POLICY',
+  'NEIGHBORHOOD', 'GOV. AGENCY PARTNERSHIP', 'MIXED-USE']}
+  ]
+
+  // d3.scale()
+
+  Category.createCategories(categories)
+}
+
+createLegend()
 
 // to return an array of unique values
 function uniq(a) {
