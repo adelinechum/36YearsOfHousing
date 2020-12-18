@@ -90,6 +90,9 @@ var popup = new mapboxgl.Popup({
   var professor = e.features[0].properties.Prof;
   var student = e.features[0].properties.StudentName;
   //var img = e.features[0].properites.DocLink;
+  var student = student.toUpperCase();
+  var coordinator = coordinator.toUpperCase();
+  var professor = professor.toUpperCase();
    
   // Ensure that if the map is zoomed out such that multiple
   // copies of the feature are visible, the popup appears

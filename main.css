@@ -6,8 +6,8 @@
 
 body {
   font-family:"Open Sans", sans-serif;
-  background-color: #333;
-  color: white;
+  background-color: #222;
+  color: rgba(255, 255, 255, 0.856);
   margin-top: 0;
 
 }
@@ -48,7 +48,9 @@ body {
 .caption{
   font-style: italic;
   font-size: 10;
-  text-align: center;
+  text-align: left;
+  margin-top: 10px;
+  margin-left: 20px;
 }
 
 .title{
@@ -58,6 +60,7 @@ body {
   font-weight: 600;
   font-size: 25px;
   display: inline-block;
+  padding: 10px;
 }
 
 #map {
@@ -100,4 +103,7 @@ body {
 
 .about {
  padding-top: 100px;
+ font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+ padding-left: 20px;
+ padding-right: 20px;
 }
