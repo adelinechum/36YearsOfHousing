@@ -65,7 +65,7 @@ map.on('load', function() {
       'case',
       ['boolean', ['feature-state', 'hover'], false],
       '#ffd300',
-      '#000'
+      '#444'
       ]
     }
   });
