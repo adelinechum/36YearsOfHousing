@@ -4,6 +4,7 @@
 
 }
 
+
 body {
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
   background-color: #222;
@@ -20,6 +21,8 @@ body {
   display: inline-block;
   right:0px;
 }
+
+
 
 /* Style the links inside the navigation bar */
 .topnav a {
@@ -69,8 +72,6 @@ body {
     position: absolute;
      z-index: -1;
 }
-
-
 
 .mapboxgl-popup {
   max-width: 400px;
