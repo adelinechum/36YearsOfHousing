@@ -31,6 +31,14 @@ var legendMargin = 25
 var subcateogryMargin = 25
 var categoryXMargin = 25;
 
+
+
+var headerX = window.innerWidth * 0.1
+var headerY = window.innerHeight * 0.1
+// header
+var header = createHeader()
+
+
 class Rectangle{
 
   static count = 0;
@@ -159,7 +167,7 @@ class Column extends Rectangle{
 
       // TODO: associate tags with panels
   }
-
+legend
   updatePanelsPositions(){
     this.panels.forEach(panel => {
       panel.updatePosition();
@@ -383,7 +391,30 @@ d3.dsv(",", "./MasterData.csv", function(d) {
       });
   });
 
+  createLegend()
+
 });
+
+function createHeader(){
+  var header = svg.append("text")
+
+  header.attr("x", headerX)
+    .attr("y", headerY)
+    .style("font-size", "30")
+    .style("stroke", "white")
+  return header
+}
+
+function clearHeaderText() {
+  header.text('')
+}
+
+function setHeaderText(text){
+  header.text('STUDIO BRIEFS THAT INCLUDE OR EMPHASIZE: ' + text)
+}
+
+// STUDIO BRIEFS THAT INCLUDE OR EMPHASIZE: +"category" OR "sub-category"
+
 
 class CategoryAbstract{
 
@@ -397,7 +428,6 @@ class CategoryAbstract{
       //   this.setColor(Category.colorScale(name))
       // })
    }
-
 
    setFontSize(fontSize){
      this.text.style("font-size", fontSize)
@@ -426,8 +456,6 @@ class CategoryAbstract{
    getX(){
      return +this.text.attr("x")
    }
-
-
 
 }
 
@@ -479,6 +507,7 @@ class Category extends CategoryAbstract {
     this.text.on('click', () => {
       Category.greyAll()
       Column.greyAll()
+      setHeaderText(this.name)
       this.setColor(Category.colorScale(this.name))
       this.subCategories.forEach(subCat => {
         subCat.setColor(Category.colorScale(subCat.name))
@@ -553,6 +582,7 @@ class Subcategory extends CategoryAbstract{
     Category.greyAll()
     Column.greyAll()
 
+    setHeaderText(this.name)
     cat.setColor(Category.colorScale(cat.name))
     this.setColor(Category.colorScale(this.name))
     Category.highlight(this.name)
@@ -586,7 +616,6 @@ function createLegend() {
   Category.createCategories(categories)
 }
 
-createLegend()
 
 // to return an array of unique values
 function uniq(a) {
