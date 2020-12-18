@@ -29,7 +29,7 @@ var eventsEnabled = true
 // legends
 // var legendX = window.innerWidth * 0.1
 var legendX = 20
-var legendY = window.innerHeight * 0.80
+var legendY = window.innerHeight * 0.75
 var legendMargin = 25
 var subcateogryMargin = 25
 var categoryXMargin = 25;
