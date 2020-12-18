@@ -397,7 +397,7 @@ function createHeader(){
 
   header.attr("x", headerX)
     .attr("y", headerY)
-    .style("font-size", "30")
+    .style("font-size", "20px")
     .style("fill", "white")
   return header
 }
