@@ -11,7 +11,7 @@ var colWidth = 30;
 var colHeight = 0;
 var colXMargin = 1;
 var expansionFactor = 2.5;
-var backgroundGrey = "#333"
+var backgroundGrey = "#222"
 
 // panels
 var panelPerCol = 13 //number of panels we want per column and sets startight height of viz
@@ -26,15 +26,16 @@ var centerY = window.innerHeight * 0.12
 var eventsEnabled = true
 
 // legends
-var legendX = window.innerWidth * 0.1
+// var legendX = window.innerWidth * 0.1
+var legendX = 20
 var legendY = window.innerHeight * 0.80
 var legendMargin = 25
 var subcateogryMargin = 25
 var categoryXMargin = 25;
 
 // header
-var headerX = window.innerWidth * 0.1
-var headerY = window.innerHeight * 0.10
+var headerX = 20
+var headerY = window.innerHeight * 0.08
 
 var header = createHeader()
 
