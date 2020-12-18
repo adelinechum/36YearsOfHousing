@@ -11,6 +11,7 @@ var colWidth = 25;
 var colHeight = 0;
 var colXMargin = 5;
 var expansionFactor = 2;
+var backgroundGrey = "#333"
 
 // panels
 var panelPerCol = 7 //number of panels we want per column
@@ -83,14 +84,14 @@ class Rectangle{
 class Column extends Rectangle{
 
   // collection of all column
-  static cols = [];
+  static all = [];
 
   // add a new column:
   // 1. move center to left
   // 2. update position of all columns
-  static addCol(year){
-    if (Column.cols.length) {
-      Column.cols.forEach(col => {
+  static addCol(year, tags){
+    if (Column.all.length) {
+      Column.all.forEach(col => {
         // here shift all columns over to left to keep centered
         col.setX(col.getX() - (colWidth + colXMargin) / 2);
         col.updateTextPosition()
@@ -98,17 +99,29 @@ class Column extends Rectangle{
       });
     }
 
-    var res = new Column(centerX + (colWidth + colXMargin) * Column.cols.length / 2, year);
-    Column.cols.push(res);
+
+    var res = new Column(centerX + (colWidth + colXMargin) * Column.all.length / 2, year, tags);
+    Column.all.push(res);
     return res;
   }
 
-  constructor(x, year){
+  static greyAll(){
+    Column.all.forEach(col => {
+      col.setColor(backgroundGrey)
+    });
+
+  }
+
+  constructor(x, year, tags){
     super()
 
     this.form = svg.append("rect")
 
     this.panelNum = 0;
+
+    this.tags = tags.split(",").map( str => {
+        return str.trim();
+      });
 
     this.panels = [];
 
@@ -117,7 +130,7 @@ class Column extends Rectangle{
       .setY(centerY)
       .setWidth(colWidth)
       .setHeight(colHeight)
-      .setColor("#222")
+      .setColor(backgroundGrey)
 
     // add year label
     this.text = svg.append("text")
@@ -182,7 +195,7 @@ class Column extends Rectangle{
     });
 
     // TODO: need a better way of differntiating on and off...
-    Column.cols.forEach(col => {
+    Column.all.forEach(col => {
       if (col.id < this.id) {
         if (r > 1) {
           col.setX(col.getX() - colWidth * expansionFactor / 2)
@@ -342,18 +355,18 @@ d3.dsv(",", "./MasterData.csv", function(d) {
   })
 
 // organize year and images
-  var years = uniq(data.map(function (e) {
+  var groupedData = uniq(data.map(function (e) {
                 return e.year
               }))
               .map(function (f) {
                 return {year: f, images: [], tags: null}
               })
 
-  console.log(years);
+  console.log(groupedData);
 
 
 // group years and images
-      years.forEach((g) => {
+      groupedData.forEach((g) => {
         data.forEach((h) => {
           if (g.year == h.year) {
             g.images.push(h.img)
@@ -363,17 +376,14 @@ d3.dsv(",", "./MasterData.csv", function(d) {
       });
 
 //create columns for years, panels for image
-  years.forEach((e) => {
-      var col = Column.addCol(e.year);
+  groupedData.forEach((e) => {
+      var col = Column.addCol(e.year, e.tags);
       e.images.forEach((img) => {
         col.addPanel(img);
       });
   });
 
 });
-
-
-
 
 class CategoryAbstract{
 
@@ -382,7 +392,12 @@ class CategoryAbstract{
      this.text = svg.append("text")
       .text(name)
       .style("stroke", "white")
+      // .on('click', () => {
+      //   Category.highlight(name)
+      //   this.setColor(Category.colorScale(name))
+      // })
    }
+
 
    setFontSize(fontSize){
      this.text.style("font-size", fontSize)
@@ -400,7 +415,8 @@ class CategoryAbstract{
    }
 
    setColor(color){
-     this.text.color = color
+     this.text.style("stroke", color)
+     return this
    }
 
    getLength(){
@@ -412,21 +428,32 @@ class CategoryAbstract{
    }
 
 
+
 }
 
 class Category extends CategoryAbstract {
 
   static count = 0
 
-  static categories = []
+  static all = []
 
+  static greyAll(){
+    Category.all.forEach(cat => {
+      cat.setColor("white")
+      cat.subCategories.forEach(subCat => {
+        subCat.setColor("white")
+      });
+
+    });
+
+  }
 
 
   static createCategories(categories){
     var xStart = legendX
     categories.forEach(cat => {
       var category = new Category(cat, xStart)
-      categories.push(category)
+      Category.all.push(category)
       xStart = category.getStartX()
     });
   }
@@ -449,6 +476,17 @@ class Category extends CategoryAbstract {
       this.subCategories[i] = new Subcategory(name, this, i)
     });
 
+    this.text.on('click', () => {
+      Category.greyAll()
+      Column.greyAll()
+      this.setColor(Category.colorScale(this.name))
+      this.subCategories.forEach(subCat => {
+        subCat.setColor(Category.colorScale(subCat.name))
+        Category.highlight(subCat.name)
+      });
+
+    })
+
   }
 
 // gets max length of all category and subcategory text.
@@ -470,16 +508,33 @@ class Category extends CategoryAbstract {
     return this.getMaxLength() + this.getX() + categoryXMargin
   }
 
-  static categoryTags = ['TERMS OF SCALE','LOW RISE HIGH DENSITY','MID DENSITY','HIGH DENSITY','SITE', 'SHARED SITE','DIFFERENT SITES', 'UNIQUE STUDIOS', 'OLYMPICS','STUDENT', 'COLUMBIA PROJECT HOUSING', 'TAKE ON "HOUSING PROBLEM"', 'GENERIC','NEW', 'PEDAGOGY', 'TYPOLOGY','PRECEDENT STUDY', 'SITE ANALYSIS', 'BRIEF LENGTH', 'SHORT','MEDIUM', 'LONG', 'OTHER', 'FINANCE/POLICY','NEIGHBORHOOD','GOV. AGENCY PARTNERSHIP', 'MIXED-USE']
+  static categoryTags = ['TERMS OF SCALE','LOW RISE HIGH DENSITY','MID DENSITY','HIGH DENSITY',
+  'SITE', 'SHARED SITE','DIFFERENT SITES',
+  'UNIQUE STUDIOS', 'OLYMPICS BID','STUDENT HOUSING', 'COLUMBIA PROJECT HOUSING',
+  'TAKE ON "HOUSING PROBLEM"', 'GRAPPLING WITH GENERIC','PROPOSING NEW MODES',
+  'PEDAGOGY', 'TYPOLOGY','PRECEDENT STUDY', 'SITE ANALYSIS',
+  'BRIEF LENGTH', 'SHORT','MEDIUM', 'LONG',
+  'OTHER', 'FINANCE/POLICY','NEIGHBORHOOD','GOV. AGENCY PARTNERSHIP', 'MIXED-USE']
 
-  static categoryColors = ["#C94D00", "#E6730D", "#FF9326", "#FFAF5D", "#94C71E",  "#B1E642", "#DCFF7F", "#E0CE00", "#FFF500", "#FFFF70", "#FFFEC8", "#8B11CC", "#C76BFF", "#D9B1FF", "#3DB88D", "#21D68C", "#7CFFAF", "#B9FFCD", "#9E2800", "#CC2E00", "#FF794E", "#FFAB87", "#073682", "#0756A6", "#2C8FE6", "#71B0EB", "#B2D7FF"]
+  static categoryColors = ["#C94D00", "#E6730D", "#FF9326", "#FFAF5D",
+  "#94C71E",  "#B1E642", "#DCFF7F",
+  "#E0CE00", "#FFF500", "#FFFF70", "#FFFEC8",
+  "#8B11CC", "#C76BFF", "#D9B1FF",
+  "#3DB88D", "#21D68C", "#7CFFAF", "#B9FFCD",
+  "#9E2800", "#CC2E00", "#FF794E", "#FFAB87",
+  "#073682", "#0756A6", "#2C8FE6", "#71B0EB", "#B2D7FF"]
+
+  static colorScale = d3.scaleOrdinal()
+    .domain(Category.categoryTags)
+    .range(Category.categoryColors)
 
   static highlight(tag){
-    Category.categories.forEach(cat => {
-      if (true) {
-
+    Column.all.forEach(col => {
+      if (col.tags.includes(tag)) {
+        col.setColor(Category.colorScale(tag))
       }
     });
+
   }
 
 }
@@ -493,15 +548,15 @@ class Subcategory extends CategoryAbstract{
         .setX(this.cat.getX())
         .setY(legendY + subcateogryMargin * (i + 1))
 
-    // this.text.on({
-    //   "mouseover": function(d) {
-    //     d3.select(this).style("cursor", "pointer");
-    //   },
-    //   "mouseout": function(d) {
-    //     d3.select(this).style("cursor", "default");
-    //   }
-    // });
 
+  this.text.on('click', () => {
+    Category.greyAll()
+    Column.greyAll()
+
+    cat.setColor(Category.colorScale(cat.name))
+    this.setColor(Category.colorScale(this.name))
+    Category.highlight(this.name)
+    });
   }
 }
 
@@ -527,8 +582,6 @@ function createLegend() {
   {name: 'OTHER', subCategories: ['FINANCE/POLICY',
   'NEIGHBORHOOD', 'GOV. AGENCY PARTNERSHIP', 'MIXED-USE']}
   ]
-
-  // d3.scale()
 
   Category.createCategories(categories)
 }
