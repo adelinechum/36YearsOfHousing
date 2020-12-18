@@ -18,14 +18,14 @@ body {
   overflow: hidden;
   position: fixed;
   display: inline-block;
-
+  right:0px;
 }
 
 /* Style the links inside the navigation bar */
 .topnav a {
   display:inline-block;
   color: white;
-  text-align: center;
+  text-align: right;
   padding: 14px 16px;
   text-decoration: currentcolor;
   font-size: 17px;
