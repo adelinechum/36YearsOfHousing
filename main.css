@@ -74,7 +74,7 @@ body {
 }
 
 .mapboxgl-popup {
-  max-width: 400px;
+  max-width: 250px;
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
@@ -86,14 +86,16 @@ body {
   color: black;
 }
 
+.mapboxgl-popup-content img {
+  max-width: 225px;
+}
+
 .mapboxgl-popup-content h2 {
   font-weight: 500;
   margin-top: 0.5em;
   margin-bottom: 0.3em;
   color: black;
-  border-width: 0px 0px 0.5px 0px;
-  border-style: solid;
-  border-color: rgb(80, 80, 80);
+
 }
 
 .mapboxgl-popup-content p {
@@ -101,6 +103,9 @@ body {
   margin-top: 0.3em;
   margin-bottom: 0em;
   color: black;
+  border-width: 0px 0px 0.5px 0px;
+  border-style: solid;
+  border-color: rgb(80, 80, 80);
 }
 
 .about {
