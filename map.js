@@ -78,7 +78,6 @@ var popup = new mapboxgl.Popup({
   closeOnClick: false
   });
    
-  var projectID = null;
 
   map.on('mouseenter', 'projects-centroids', function (e) {
   // Change the cursor style as a UI indicator.
@@ -93,8 +92,6 @@ var popup = new mapboxgl.Popup({
   var student = student.toUpperCase();
   var coordinator = coordinator.toUpperCase();
   var professor = professor.toUpperCase();
-  var imagePath
-  console.log(img);
    
   // Ensure that if the map is zoomed out such that multiple
   // copies of the feature are visible, the popup appears
@@ -108,50 +105,40 @@ var popup = new mapboxgl.Popup({
   popup.setLngLat(coordinates).setHTML('<h2>' + year +  '</h2>' + 
   '<h4>Coordinator: ' + coordinator  + ' Professor: ' + professor + '</h4>'
   + '<p> Students: ' + student + '</p>' + '<br>' + '<img src="' + img +'">').addTo(map);
-  
-   // Check whether features exist
-   if (e.features.length > 0) {
 
-     // If quakeID for the hovered feature is not null,
-    // use removeFeatureState to reset to the default behavior
-    if (projectID) {
-      map.removeFeatureState({
-        source: "projects",
-        id: projectID
-      });
-    }
-
-    projectID = e.features[0].id;
-
-    // When the mouse moves over the projects layer, update the
-    // feature state for the feature under the mouse
-    map.setFeatureState({
-      source: 'projects',
-      id: projectID,
-    }, {
-      hover: true
-    });
-
-  }
 
 });
    
   map.on('mouseleave', 'projects-centroids', function () {
   map.getCanvas().style.cursor = '';
   popup.remove();
-  if (projectID) {
-    map.setFeatureState({
-      source: 'projects',
-      id: projectID
-  }, {
-    hover: false
-  });
-  }
-
-  projectID = null;
   // Remove the information from the previously hovered feature from the sidebar
   map.getCanvas().style.cursor = '';
   });
+  });
 
 
-});  
+  map.on('click', 'projects-centroids', function (f) {
+  
+    var img = document.createElement("img");
+    img.src = f.features[0].properties.DocLink;
+    var src = document.getElementById("overlay");
+    src.style.display = "block";
+    src.appendChild(img);
+    
+    src.addEventListener("click", function() {
+      src.style.display="none";
+      src.removeChild(img);
+    });
+    
+    //escape keydown exit not working not exactly sure why but w.e
+    /*
+    src.addEventListener('keydown', function(event){
+      if(event.key === "Escape"){
+        src.style.display="none";
+        src.removeChild(img);
+      }
+    });
+    */
+   
+  });
