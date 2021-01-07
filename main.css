@@ -74,7 +74,7 @@ body {
 }
 
 .mapboxgl-popup {
-  max-width: 250px;
+  max-width: 100px;
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
@@ -87,7 +87,10 @@ body {
 }
 
 .mapboxgl-popup-content img {
-  max-width: 225px;
+  display: block;
+  margin-left: auto;
+  margin-right:auto;
+  width: 75%;
 }
 
 .mapboxgl-popup-content h2 {
