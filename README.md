@@ -4,6 +4,8 @@
 
 **For: Jia Zhang’s Fall 2020 DataViz for the Humanities course at the Columbia GSAPP**
 
+Link to Project: https://adelinechum.github.io/36YearsOfHousing/
+
 This project is about the Columbia GSAPP's Housing Studio, which began in 1974 as a result of student activism and the coordinated interests of new faculty. The studio has continued in different iterations over the 40+ years since, and has changed with the dominant ideas in architecture as well as with the social political and economic pressures on the city. 36 YEARS OF HOUSING is centered around two components: Data comprised of individual student projects, and Tags which are an attempt to draw some lessons from the past 40 or so years of production out of them.
 
 36 YEARS OF HOUSING was made by three Master of Architecture students during their completion of the Housing Studio, but would not have been possible without the work done in 2014 by the GSAPP Exhibitions Team, in a retrospective of the GSAPP Housing Studio titled “GSAPP Housing Studios, 1974-2014.”
